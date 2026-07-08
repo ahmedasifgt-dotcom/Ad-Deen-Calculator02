@@ -37,12 +37,23 @@
 
 <script>
     function saveDataAndGo() {
-        // এখানে নাম এবং অ্যামাউন্টগুলো ভেরিয়েবলে সেভ করে রাখুন
-        const userName = document.getElementById('user-name').value;
-        const estateAmount = document.getElementById('total-estate-amount').value;
-        
-        // দ্বিতীয় পেজের ইনপুট ফিল্ডে ভ্যালু পাঠিয়ে দিন
-        document.getElementById('estateValue').value = estateAmount;
+    const uName = document.getElementById('user-name').value;
+    const dName = document.getElementById('deceased-name').value;
+    const amount = document.getElementById('total-estate-amount').value;
+    
+    // ডাটাবেসে সেভ করুন
+    firebase.database().ref('miras_records/').push({
+        userName: uName,
+        deceasedName: dName,
+        amount: amount,
+        timestamp: Date.now()
+    });
+
+    // পরের পেজে যান
+    document.getElementById('page1').classList.remove('active-page');
+    document.getElementById('page2').classList.add('active-page');
+}
+
         
         // পেজ পরিবর্তন
         document.getElementById('page1').classList.remove('active-page');
@@ -489,6 +500,12 @@ function resetCard(id, msg) {
 function processMirasSimulation() {
     syncUI();
     
+    // ডাটাবেসে সেভ করার জন্য এই ৩ লাইন যোগ করুন:
+    const userName = document.getElementById('user-name')?.value || "অজ্ঞাত";
+    const deceasedName = document.getElementById('deceased-name')?.value || "অজ্ঞাত";
+    const amount = document.getElementById('estateValue').value;
+    saveToDatabase(userName, deceasedName, amount); // এই ফাংশনটি আপনার নিচে স্ক্রিপ্টে ডিফাইন করা থাকতে হবে
+
     const deceased = document.getElementById('deceased').value;
     const totalAsset = parseFloat(document.getElementById('estateValue').value) || 0;
     const spouseStatus = document.getElementById('spouse').value;
@@ -589,6 +606,25 @@ syncUI();
         <button class="action-btn" onclick="document.getElementById('page2').classList.remove('active-page'); document.getElementById('page1').classList.add('active-page');">ফিরে যান</button>
     </div>
 </div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    function saveToDatabase(userName, deceasedName, amount) {
+        firebase.database().ref('miras_records/').push({
+            userName: userName,
+            deceasedName: deceasedName,
+            amount: amount,
+            date: new Date().toLocaleString()
+        });
+    }
+</script>
 
 </body>
 </html>
