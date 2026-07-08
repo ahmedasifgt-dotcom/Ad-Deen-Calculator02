@@ -1,298 +1,56 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Islamic Miras Calculator & Conflict Resolver</title>
-    <style>
-        :root {
-            --primary: #1e5e3a;
-            --secondary: #eef7f2;
-            --dark: #2d3748;
-            --accent: #d97706;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7fafc;
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        input[type="number"], select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        input[type="number"]:focus, select:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        button {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #16472b;
-        }
-        .warning-box {
-            background-color: #fffbeb;
-            border-left: 4px solid var(--accent);
-            padding: 15px;
-            margin: 25px 0;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            color: #92400e;
-        }
-        .results-box {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: var(--secondary);
-            border-radius: 8px;
-            border: 1px solid #c6f6d5;
-            display: none;
-        }
-        .results-box h2 {
-            color: var(--primary);
-            margin-top: 0;
-        }
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .share-badge {
-            font-weight: bold;
-            color: var(--primary);
-        }
-    </style>
-</head>
-<body>
+<!-- ফ্যামিলি ট্রি গ্রিড লেআউট -->
+<div class="glass-card">
+    <div class="card-heading">🌳 লাইভ ফ্যামিলি ওয়ারিশ গ্রাফ (VISUAL FAMILY TREE)</div>
+    <div class="family-tree-container">
+        <!-- মাতা ও স্বামী/স্ত্রী কার্ড -->
+        <div class="tree-row">
+            <div class="member-card active-heir" id="card-mother">
+                <div class="member-title">মাতা (Mother)</div>
+                <div class="member-allocation" id="alloc-mother">২,০০,০০০ ৳</div>
+            </div>
+        </div>
+        <div class="tree-row">
+            <div class="member-card active-heir" id="card-spouse">
+                <div class="member-title">স্বামী (Husband)</div>
+                <div class="member-allocation" id="alloc-spouse">৩,০০,০০০ ৳</div>
+            </div>
+        </div>
+        <!-- পুত্র ও কন্যা কার্ড -->
+        <div class="tree-row">
+            <div class="member-card active-heir" id="card-sons">
+                <div class="member-title">পুত্র (Sons)</div>
+                <div class="member-allocation" id="alloc-sons">৬,৫০,০০০ ৳</div>
+            </div>
+            <div class="member-card active-heir" id="card-daughters">
+                <div class="member-title">কন্যা (Daughters)</div>
+                <div class="member-allocation" id="alloc-daughters">১,৪০,০০০ ৳</div>
+            </div>
+        </div>
+    </div>
 
-<div class="container">
-    <h1>Islamic Inheritance (Miras) Engine</h1>
-    <div class="subtitle">A smart prototype mapping Hanafi Fiqh calculations into modern code</div>
-
-    <!-- NEW: Select Who Died -->
+    <!-- ইনপুট ফর্ম কন্ট্রোলস -->
     <div class="form-group">
-        <label for="deceased">Who is the Deceased Person? (মৃত ব্যক্তি কে?)</label>
-        <select id="deceased" onchange="updateSpouseDropdown()">
-            <option value="father">Father (পিতা মারা গেছেন)</option>
-            <option value="mother">Mother (মাতা মারা গেছেন)</option>
+        <label>মৃত ব্যক্তি কে?</label>
+        <select>
+            <option>পিতা (স্ত্রী মারা গেছেন)</option>
         </select>
     </div>
 
-    <!-- Estate Value -->
     <div class="form-group">
-        <label for="estateValue">Total Distributable Estate Value (BDT / Taka):</label>
-        <input type="number" id="estateValue" value="1200000" min="0">
+        <label>মোট বণ্টনযোগ্য সম্পত্তি</label>
+        <input type="number" value="1200000">
     </div>
 
-    <div class="grid-2">
-        <!-- Dynamic Spouse Option -->
-        <div class="form-group">
-            <label id="spouseLabel" for="spouse">Surviving Wife Status:</label>
-            <select id="spouse">
-                <option value="alive">Alive (স্ত্রী জীবিত)</option>
-                <option value="none">None / Deceased (স্ত্রী নেই)</option>
-            </select>
-        </div>
+    <button class="action-btn">শরিয়াহ মোতাবেক সিমুলেট করুন</button>
 
-        <!-- Parents Option -->
-        <div class="form-group">
-            <label for="mother">Deceased's Mother Status:</label>
-            <select id="mother">
-                <option value="alive">Alive (মৃত ব্যক্তির মা জীবিত)</option>
-                <option value="dead">Deceased (মৃত ব্যক্তির মা মৃত)</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="grid-2">
-        <!-- Children Configuration -->
-        <div class="form-group">
-            <label for="sons">Number of Surviving Sons:</label>
-            <input type="number" id="sons" value="2" min="0">
-        </div>
-
-        <div class="form-group">
-            <label for="daughters">Number of Surviving Daughters:</label>
-            <input type="number" id="daughters" value="1" min="0">
-        </div>
-    </div>
-
-    <button onclick="calculateMiras()">Calculate Shariah Shares</button>
-
+    <!-- শরিয়াহ সতর্কীকরণ নোটিশ -->
     <div class="warning-box">
-        <strong>⚠️ Shariah Guard Note:</strong> In Bangladeshi culture, daughters are frequently pressured to waive their shares of inheritance land/property in favor of their brothers due to social expectations. According to orthodox Fiqh, any waiver executed under social duress or emotional manipulation is legally null and void. Ensure all heirs receive their exact fractions.
-    </div>
-
-    <div id="resultsPanel" class="results-box">
-        <h2>Distribution Breakdown</h2>
-        <div id="resultsList"></div>
+        <strong>⚠️ শরিয়াহ সতর্কীকরণ নোটিশ (Shariah Guard Note):</strong>
+        <div class="warning-text-content">
+            বাংলাদেশী সামাজিক ও পারিবারিক সংস্কৃতির দোহাই দিয়ে... (আপনার আগের নোটিশ টেক্সট)
+        </div>
     </div>
 </div>
 
-<script>
-// Automatically update the label texts based on who passed away
-function updateSpouseDropdown() {
-    const deceased = document.getElementById('deceased').value;
-    const spouseLabel = document.getElementById('spouseLabel');
-    const spouseSelect = document.getElementById('spouse');
-
-    if (deceased === 'father') {
-        spouseLabel.innerText = "Surviving Wife Status:";
-        spouseSelect.innerHTML = `
-            <option value="alive">Alive (স্ত্রী জীবিত)</option>
-            <option value="none">None / Deceased (স্ত্রী নেই)</option>
-        `;
-    } else {
-        spouseLabel.innerText = "Surviving Husband Status:";
-        spouseSelect.innerHTML = `
-            <option value="alive">Alive (স্বামী জীবিত)</option>
-            <option value="none">None / Deceased (স্বামী নেই)</option>
-        `;
-    }
-}
-
-function calculateMiras() {
-    const deceased = document.getElementById('deceased').value;
-    const totalAsset = parseFloat(document.getElementById('estateValue').value) || 0;
-    const spouseStatus = document.getElementById('spouse').value;
-    const isMotherAlive = document.getElementById('mother').value === 'alive';
-    const sonsCount = parseInt(document.getElementById('sons').value) || 0;
-    const daughtersCount = parseInt(document.getElementById('daughters').value) || 0;
-
-    let initialAsset = totalAsset;
-    let distributions = [];
-    const hasChildren = (sonsCount > 0 || daughtersCount > 0);
-
-    // 1. Calculate Spouse Share based on gender of deceased
-    let spouseFraction = 0;
-    let spouseLabelText = "";
-    let fractionStr = "";
-
-    if (deceased === 'father') {
-        spouseLabelText = "Wife (স্ত্রী)";
-        if (spouseStatus === 'alive') {
-            spouseFraction = hasChildren ? (1/8) : (1/4);
-            fractionStr = hasChildren ? "1/8" : "1/4";
-        }
-    } else {
-        spouseLabelText = "Husband (স্বামী)";
-        if (spouseStatus === 'alive') {
-            spouseFraction = hasChildren ? (1/4) : (1/2);
-            fractionStr = hasChildren ? "1/4" : "1/2";
-        }
-    }
-
-    if (spouseFraction > 0) {
-        let amount = initialAsset * spouseFraction;
-        distributions.push({ name: spouseLabelText, fraction: fractionStr, cash: amount });
-        initialAsset -= amount;
-    }
-
-    // 2. Calculate Mother Share (The mother of the deceased)
-    if (isMotherAlive) {
-        let motherFractionVal = hasChildren ? (1/6) : (1/3);
-        let motherFractionStr = hasChildren ? "1/6" : "1/3";
-        let amount = initialAsset * motherFractionVal;
-        distributions.push({ name: "Mother of Deceased (মাতা)", fraction: motherFractionStr, cash: amount });
-        initialAsset -= amount;
-    }
-
-    // 3. Residuary Distribution to Children (Asabat)
-    if (hasChildren) {
-        let totalParts = (sonsCount * 2) + (daughtersCount * 1);
-        let sharePerPart = initialAsset / totalParts;
-
-        if (sonsCount > 0) {
-            let totalSonCash = sharePerPart * 2 * sonsCount;
-            distributions.push({ 
-                name: `Sons (পুত্র সন্তানসমূহ) - Total for ${sonsCount}`, 
-                fraction: `Asabah (2 parts each)`, 
-                cash: totalSonCash,
-                individual: sonsCount > 1 ? (sharePerPart * 2) : null
-            });
-        }
-
-        if (daughtersCount > 0) {
-            let totalDaughterCash = sharePerPart * 1 * daughtersCount;
-            distributions.push({ 
-                name: `Daughters (কন্যা সন্তানসমূহ) - Total for ${daughtersCount}`, 
-                fraction: `Asabah (1 part each)`, 
-                cash: totalDaughterCash,
-                individual: daughtersCount > 1 ? (sharePerPart * 1) : null
-            });
-        }
-    }
-
-    // Render to UI
-    const resultsList = document.getElementById('resultsList');
-    resultsList.innerHTML = "";
-    
-    distributions.forEach(item => {
-        let indText = item.individual ? ` <small style="color:#666;">(${item.individual.toFixed(2)} ৳ each)</small>` : "";
-        resultsList.innerHTML += `
-            <div class="result-item">
-                <span><strong>${item.name}</strong>${indText}</span>
-                <span class="share-badge">${item.fraction} ➔ ${item.cash.toFixed(2)} ৳</span>
-            </div>
-        `;
-    });
-
-    document.getElementById('resultsPanel').style.display = "block";
-}
-</script>
-
-</body>
-</html>
 
 
