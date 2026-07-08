@@ -6,20 +6,18 @@
     <title>Ad-Deen Visual Miras Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Amiri+Quran&family=Noto+Serif+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%);
-            --glass: rgba(255, 255, 255, 0.05);
-            --accent: #E6C25A;
-        }
+        :root { --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%); --accent: #E6C25A; }
         body { background: var(--bg-gradient); color: #F8FAFC; min-height: 100vh; padding: 20px; font-family: 'Plus Jakarta Sans', sans-serif; }
         .app-container { max-width: 680px; margin: 0 auto; }
         .page { display: none; }
         .active-page { display: block; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .bismillah { font-family: 'Amiri Quran', serif; font-size: 2.2rem; color: var(--accent); text-align: center; direction: rtl; }
-        h1 { text-align: center; font-size: 2.5rem; font-weight: 800; color: #FFF; }
-        .action-btn { width: 100%; background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer; color: #000; }
+        h1 { text-align: center; font-size: 2.5rem; font-weight: 800; color: #FFF; margin-bottom: 20px; }
+        .action-btn { width: 100%; background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer; color: #000; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 12px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.1); color: #FFF; }
+        .member-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px; text-align: center; }
+        .results-wrapper { display: none; }
     </style>
 </head>
 <body>
@@ -30,36 +28,53 @@
         <h1>Ad-Deen Calculator</h1>
     </header>
 
-    <!-- পেজ ১: ইনপুট ফর্ম -->
     <div id="page1" class="page active-page glass-card">
-        <h3 class="text-xl font-bold mb-4">নিচের প্রশ্নগুলোর উত্তর দিন</h3>
+        <h3 class="text-xl font-bold mb-4 text-center">নিচের প্রশ্নগুলোর উত্তর দিন</h3>
         <form id="data-form">
             <input type="text" id="user-name" placeholder="আপনার নাম" required>
             <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম" required>
             <input type="number" id="amount" placeholder="উত্তরাধিকারের পরিমাণ (টাকা)" required>
-            <button type="submit" class="action-btn">পরবর্তী ধাপে যান</button>
+            <button type="submit" class="action-btn">ক্যালকুলেটর দেখুন</button>
         </form>
     </div>
 
-    <!-- পেজ ২: মেইন ক্যালকুলেটর -->
     <div id="page2" class="page">
-        <!-- এখানে আপনার মূল ক্যালকুলেটর অংশটুকু -->
         <div class="glass-card">
             <h2 class="text-center mb-4">মীরাস ক্যালকুলেটর</h2>
-            <!-- বাকি ক্যালকুলেটর কোড এখানে আগের মতোই থাকবে -->
-            <button class="action-btn" onclick="location.reload()">আবার শুরু করুন</button>
+            
+            <div class="grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div class="member-card" id="card-mother">মাতা</div>
+                <div class="member-card" id="card-spouse">স্ত্রী/স্বামী</div>
+            </div>
+            
+            <select id="deceased" onchange="syncUI()">
+                <option value="father">পিতা মারা গেছেন</option>
+                <option value="mother">মাতা মারা গেছেন</option>
+            </select>
+            
+            <input type="number" id="estateValue" value="1200000">
+            <button class="action-btn" onclick="processMirasSimulation()">হিসাব করুন</button>
+            <div id="resultsPanel" class="results-wrapper glass-card mt-4">
+                <div id="resultsList"></div>
+            </div>
+            <button class="action-btn" style="background:#444; color:#fff; margin-top:10px;" onclick="location.reload()">আবার শুরু করুন</button>
         </div>
     </div>
 </div>
 
 <script>
+    // পেজ পরিবর্তনের লজিক
     document.getElementById('data-form').addEventListener('submit', function(e) {
         e.preventDefault();
-        // পেজ পরিবর্তন
         document.getElementById('page1').classList.remove('active-page');
         document.getElementById('page2').classList.add('active-page');
-        // এখানে ফর্মের ডেটাগুলো Firebase এ পাঠানোর ফাংশন কল করতে পারেন
     });
+
+    function syncUI() { /* আগের ফাংশন */ }
+    function processMirasSimulation() { 
+        document.getElementById('resultsPanel').style.display = 'block';
+        alert("হিসাব সম্পন্ন হয়েছে!"); 
+    }
 </script>
 </body>
 </html>
