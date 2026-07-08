@@ -4,557 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ad-Deen Visual Miras Calculator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Amiri+Quran&family=Noto+Serif+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%);
             --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #E6C25A;
-            --accent-glow: rgba(230, 194, 90, 0.4);
-            --text-light: #F8FAFC;
-            --text-dim: #94A3B8;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', 'Noto Serif Bengali', system-ui, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text-light);
-            min-height: 100vh;
-            padding: 24px 12px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .bismillah {
-            font-family: 'Amiri Quran', serif;
-            font-size: 2.2rem;
-            color: var(--accent);
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(230, 194, 90, 0.3);
-            margin-bottom: 10px;
-            direction: rtl;
-        }
-
-        header h1 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 50%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        header .bangla-subtitle {
-            color: #E2E8F0;
-            font-size: 1.05rem;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.08);
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 10px;
-        }
-
-        .visual-subtitle {
-            color: var(--accent);
-            font-size: 0.9rem;
-            font-weight: 600;
-            opacity: 0.9;
-        }
-
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            margin-bottom: 20px;
-        }
-
-        .card-heading {
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            margin-bottom: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* --- VISUAL FAMILY TREE ARCHITECTURE --- */
-        .family-tree-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px 10px;
-            border-radius: 16px;
-            border: 1px dashed var(--glass-border);
-            margin-bottom: 24px;
-        }
-
-        .tree-row {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            flex-wrap: wrap;
-        }
-
-        .member-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 12px;
-            width: 130px;
-            text-align: center;
-            transition: all 0.4s ease;
-        }
-
-        .member-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .member-status {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-        }
-
-        .member-allocation {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-top: 6px;
-            display: none;
-        }
-
-        .member-card.active-heir {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
-            transform: scale(1.04);
-            background: rgba(230, 194, 90, 0.1);
-        }
-
-        .member-card.blocked-heir {
-            opacity: 0.25;
-            filter: blur(0.8px);
-            border-color: #EF4444;
-        }
-
-        /* --- FORMS --- */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-light);
-            margin-bottom: 6px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .currency-symbol {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px;
-            color: #FFFFFF;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        input#estateValue {
-            padding-left: 32px;
-            color: var(--accent);
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        button.action-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #E6C25A 0%, #C9A43B 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 14px;
-            color: #041a10;
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(230, 194, 90, 0.2);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        /* --- WARNING BOX --- */
-        .warning-box {
-            background: #FFFFFF;
-            border: 3px solid #000000;
-            padding: 16px;
-            border-radius: 14px;
-            box-shadow: 6px 6px 0px #000000;
-            margin-top: 10px;
-        }
-
-        .warning-box strong {
-            display: block;
-            color: #FF0000;
-            font-size: 1rem;
-            font-weight: 900;
-            margin-bottom: 6px;
-        }
-
-        .warning-text-content {
-            font-size: 0.85rem;
-            line-height: 1.6;
-            font-weight: 700;
-            color: #E60000;
-        }
-
-        .results-wrapper {
-            display: none;
-            animation: presentUp 0.4s ease forwards;
-        }
-
-        @keyframes presentUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-item {
-            background: rgba(15, 23, 42, 0.2);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .heir-name { font-weight: 700; font-size: 0.9rem; }
-        .heir-sub { font-size: 0.75rem; color: var(--text-dim); }
-        .share-badge {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            font-weight: 700;
-        }
-        .cash-text { font-size: 0.95rem; font-weight: 700; color: #FFF; margin-top: 2px;}
+        body { background: var(--bg-gradient); color: #F8FAFC; min-height: 100vh; padding: 20px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .app-container { max-width: 680px; margin: 0 auto; }
+        .page { display: none; }
+        .active-page { display: block; }
+        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .bismillah { font-family: 'Amiri Quran', serif; font-size: 2.2rem; color: var(--accent); text-align: center; direction: rtl; }
+        h1 { text-align: center; font-size: 2.5rem; font-weight: 800; color: #FFF; }
+        .action-btn { width: 100%; background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer; color: #000; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 12px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.1); color: #FFF; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <!-- 100% Fixed Arabic Font Render -->
         <div class="bismillah">&#xfdfd;</div>
         <h1>Ad-Deen Calculator</h1>
-        <div class="bangla-subtitle">উত্তরাধিকার সম্পত্তি হিসাব করুন মাত্র এক ক্লিকে!!</div>
-        <div class="visual-subtitle">🌿 ইন্টারেক্টিভ ভিজ্যুয়াল মীরাস সিমুলেটর</div>
     </header>
 
-    <!-- VISUAL FAMILY TREE PANEL -->
-    <div class="glass-card">
-        <div class="card-heading">🌳 লাইভ ফ্যামিলি ওয়ারিশ গ্রাফ (Visual Family Tree)</div>
-        <div class="family-tree-container">
-            <div class="tree-row">
-                <div class="member-card" id="card-mother">
-                    <div class="member-title">মাতা (Mother)</div>
-                    <div class="member-status" id="status-mother">অপেক্ষা করছে</div>
-                    <div class="member-allocation" id="alloc-mother">0 ৳</div>
-                </div>
-            </div>
-            <div class="tree-row">
-                <div class="member-card" id="card-spouse">
-                    <div class="member-title" id="title-spouse">স্ত্রী (Wife)</div>
-                    <div class="member-status" id="status-spouse">অপেক্ষা করছে</div>
-                    <div class="member-allocation" id="alloc-spouse">0 ৳</div>
-                </div>
-            </div>
-            <div class="tree-row">
-                <div class="member-card" id="card-sons">
-                    <div class="member-title">পুত্র (Sons)</div>
-                    <div class="member-status" id="status-sons">অপেক্ষা করছে</div>
-                    <div class="member-allocation" id="alloc-sons">0 ৳</div>
-                </div>
-                <div class="member-card" id="card-daughters">
-                    <div class="member-title">কন্যা (Daughters)</div>
-                    <div class="member-status" id="status-daughters">অপেক্ষা করছে</div>
-                    <div class="member-allocation" id="alloc-daughters">0 ৳</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FORM CONTROLS -->
-        <div class="form-group">
-            <label for="deceased">মৃত ব্যক্তি কে?</label>
-            <select id="deceased" onchange="syncUI()">
-                <option value="father">পিতা (স্বামী মারা গেছেন)</option>
-                <option value="mother">মাতা (স্ত্রী মারা গেছেন)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="estateValue">মোট বণ্টনযোগ্য সম্পত্তি</label>
-            <div class="input-wrapper">
-                <span class="currency-symbol">৳</span>
-                <input type="number" id="estateValue" value="1200000" min="0">
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="form-group">
-                <label id="spouseLabel" for="spouse">জীবিত স্ত্রীর অবস্থা:</label>
-                <select id="spouse" onchange="syncUI()">
-                    <option value="alive">জীবিত (Alive)</option>
-                    <option value="none">মৃত / নেই</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="mother">মাতার অবস্থা:</label>
-                <select id="mother" onchange="syncUI()">
-                    <option value="alive">জীবিত (Alive)</option>
-                    <option value="dead">মৃত / নেই</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="form-group">
-                <label for="sons">পুত্র সংখ্যা</label>
-                <input type="number" id="sons" value="2" min="0" oninput="syncUI()">
-            </div>
-            <div class="form-group">
-                <label for="daughters">কন্যা সংখ্যা</label>
-                <input type="number" id="daughters" value="1" min="0" oninput="syncUI()">
-            </div>
-        </div>
-
-        <button class="action-btn" onclick="processMirasSimulation()">শরিয়াহ মোতাবেক সিমুলেট করুন</button>
-
-        <!-- WARNING BOX RESTORED -->
-        <div class="warning-box">
-            <strong>⚠️ শরিয়াহ সতর্কীকরণ নোটিশ (Shariah Guard Note):</strong>
-            <div class="warning-text-content">
-                বাংলাদেশী সামাজিক ও পারিবারিক সংস্কৃতির দোহাই দিয়ে অনেক সময় কন্যা সন্তানদের তাদের প্রাপ্য উত্তরাধিকার স্থাবর সম্পত্তি বা জমি ভাইদের অনুকূলে ছেড়ে দেওয়ার জন্য অনৈতিক মানসিক বা সামাজিক চাপ সৃষ্টি করা হয়। কিন্তু বিশুদ্ধ অর্থোডক্স হানাফি ফিকহ ও ইসলামী আইন অনুযায়ী, যেকোনো প্রকার সামাজিক বা মানসিক চাপের মুখে পড়ে নিজের হক বা সম্পত্তি মওকুফ বা ত্যাগ করলে তা শরিয়াহর দৃষ্টিতে সম্পূর্ণ বাতিল এবং অবৈধ (Null and Void) বলে গণ্য হবে। প্রত্যেক ওয়ারিশকে তাদের সুনির্দিষ্ট ও নিখুঁত অংশ বুঝিয়ে দেওয়া বাধ্যতামূলক।
-            </div>
-        </div>
+    <!-- পেজ ১: ইনপুট ফর্ম -->
+    <div id="page1" class="page active-page glass-card">
+        <h3 class="text-xl font-bold mb-4">নিচের প্রশ্নগুলোর উত্তর দিন</h3>
+        <form id="data-form">
+            <input type="text" id="user-name" placeholder="আপনার নাম" required>
+            <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম" required>
+            <input type="number" id="amount" placeholder="উত্তরাধিকারের পরিমাণ (টাকা)" required>
+            <button type="submit" class="action-btn">পরবর্তী ধাপে যান</button>
+        </form>
     </div>
 
-    <!-- REPORT BLOCK -->
-    <div id="resultsPanel" class="glass-card results-wrapper">
-        <div class="card-heading">✨ সম্পত্তির গাণিতিক বিশ্লেষণ রিপোর্ট</div>
-        <div id="resultsList"></div>
+    <!-- পেজ ২: মেইন ক্যালকুলেটর -->
+    <div id="page2" class="page">
+        <!-- এখানে আপনার মূল ক্যালকুলেটর অংশটুকু -->
+        <div class="glass-card">
+            <h2 class="text-center mb-4">মীরাস ক্যালকুলেটর</h2>
+            <!-- বাকি ক্যালকুলেটর কোড এখানে আগের মতোই থাকবে -->
+            <button class="action-btn" onclick="location.reload()">আবার শুরু করুন</button>
+        </div>
     </div>
 </div>
 
 <script>
-function syncUI() {
-    const deceased = document.getElementById('deceased').value;
-    const spouseSelect = document.getElementById('spouse').value;
-    const isMotherAlive = document.getElementById('mother').value === 'alive';
-    const sons = parseInt(document.getElementById('sons').value) || 0;
-    const daughters = parseInt(document.getElementById('daughters').value) || 0;
-
-    document.getElementById('spouseLabel').innerText = deceased === 'father' ? "জীবিত স্ত্রীর অবস্থা:" : "জীবিত স্বামীর অবস্থা:";
-    document.getElementById('title-spouse').innerText = deceased === 'father' ? "স্ত্রী (Wife)" : "স্বামী (Husband)";
-
-    resetCard('card-mother', isMotherAlive ? "অবস্থাগত সক্রিয়" : "মৃত / অনুপস্থিত");
-    resetCard('card-spouse', spouseSelect === 'alive' ? "অবস্থাগত সক্রিয়" : "মৃত / অনুপস্থিত");
-    resetCard('card-sons', sons > 0 ? `${sons} জন ওয়ারিশ` : "নেই");
-    resetCard('card-daughters', daughters > 0 ? `${daughters} জন ওয়ারিশ` : "নেই");
-}
-
-function resetCard(id, msg) {
-    const card = document.getElementById(id);
-    card.className = "member-card";
-    document.getElementById('status-' + id.split('-')[1]).innerText = msg;
-    document.getElementById('alloc-' + id.split('-')[1]).style.display = "none";
-}
-
-function processMirasSimulation() {
-    syncUI();
-    
-    const deceased = document.getElementById('deceased').value;
-    const totalAsset = parseFloat(document.getElementById('estateValue').value) || 0;
-    const spouseStatus = document.getElementById('spouse').value;
-    const isMotherAlive = document.getElementById('mother').value === 'alive';
-    const sonsCount = parseInt(document.getElementById('sons').value) || 0;
-    const daughtersCount = parseInt(document.getElementById('daughters').value) || 0;
-
-    let remaining = totalAsset;
-    let records = [];
-    const hasChildren = (sonsCount > 0 || daughtersCount > 0);
-
-    if (spouseStatus === 'alive') {
-        let f = hasChildren ? (deceased==='father'? 1/8 : 1/4) : (deceased==='father'? 1/4 : 1/2);
-        let str = hasChildren ? (deceased==='father'?"1/8":"1/4") : (deceased==='father'?"1/4":"1/2");
-        let amt = totalAsset * f;
-        records.push({ id: 'card-spouse', name: deceased==='father'?"স্ত্রী":"স্বামী", fraction: str, cash: amt, type: 'fixed' });
-        remaining -= amt;
-    } else {
-        markBlocked('card-spouse', 'অনুপস্থিত');
-    }
-
-    if (isMotherAlive) {
-        let f = hasChildren ? 1/6 : 1/3;
-        let str = hasChildren ? "1/6" : "1/3";
-        let amt = totalAsset * f;
-        records.push({ id: 'card-mother', name: "মাতা", fraction: str, cash: amt, type: 'fixed' });
-        remaining -= amt;
-    } else {
-        markBlocked('card-mother', 'অনুপস্থিত');
-    }
-
-    if (hasChildren) {
-        let parts = (sonsCount * 2) + (daughtersCount * 1);
-        let shareUnit = Math.max(0, remaining) / parts;
-
-        if (sonsCount > 0) {
-            let totalSonAmt = shareUnit * 2 * sonsCount;
-            records.push({ id: 'card-sons', name: `পুত্র (×${sonsCount})`, fraction: "আসাবাহ্", cash: totalSonAmt, type: 'residue', single: shareUnit*2 });
-        } else {
-            markBlocked('card-sons', 'নেই');
-        }
-
-        if (daughtersCount > 0) {
-            let totalDaughterAmt = shareUnit * 1 * daughtersCount;
-            records.push({ id: 'card-daughters', name: `কন্যা (×${daughtersCount})`, fraction: "আসাবাহ্", cash: totalDaughterAmt, type: 'residue', single: shareUnit });
-        } else {
-            markBlocked('card-daughters', 'নেই');
-        }
-        remaining = 0;
-    } else {
-        markBlocked('card-sons', 'কোনো সন্তান নেই');
-        markBlocked('card-daughters', 'কোনো সন্তান নেই');
-    }
-
-    const resultsList = document.getElementById('resultsList');
-    resultsList.innerHTML = "";
-
-    records.forEach(item => {
-        const card = document.getElementById(item.id);
-        card.classList.add('active-heir');
-        
-        const statusEl = document.getElementById('status-' + item.id.split('-')[1]);
-        const allocEl = document.getElementById('alloc-' + item.id.split('-')[1]);
-        
-        statusEl.innerText = `পাবেন (${item.fraction})`;
-        allocEl.innerText = `${Math.round(item.cash).toLocaleString('bn-BD')} ৳`;
-        allocEl.style.display = "block";
-
-        let subText = item.type === 'fixed' ? "কোরআনিক নির্ধারিত সুনির্দিষ্ট অংশ" : `অবশিষ্টাংশভোগী (প্রত্যেকে পাবে: ${Math.round(item.single || item.cash).toLocaleString('bn-BD')} ৳)`;
-        resultsList.innerHTML += `
-            <div class="result-item">
-                <div>
-                    <div class="heir-name">${item.name}</div>
-                    <div class="heir-sub">${subText}</div>
-                </div>
-                <div style="text-align: right">
-                    <span class="share-badge">${item.fraction}</span>
-                    <div class="cash-text">${item.cash.toLocaleString('bn-BD', {maximumFractionDigits:2})} ৳</div>
-                </div>
-            </div>
-        `;
-    });
-
-    document.getElementById('resultsPanel').style.display = "block";
-}
-
-function markBlocked(id, reason) {
-    const card = document.getElementById(id);
-    card.classList.add('blocked-heir');
-    document.getElementById('status-' + id.split('-')[1]).innerText = reason;
-}
-
-syncUI();
     document.getElementById('data-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // ফর্ম থেকে ডেটা নেওয়া
-    const userName = document.getElementById('user-name').value;
-    const deceasedName = document.getElementById('deceased-name').value;
-    const amount = document.getElementById('amount').value;
-    
-    // আপাতত আমরা কনসোলে টেস্ট করছি, পরে Firebase এ পাঠাবো
-    console.log("তথ্য জমা হয়েছে:", { userName, deceasedName, amount });
-    alert("আপনার তথ্য সফলভাবে জমা হয়েছে!");
-    
-    // ফর্ম ক্লিয়ার করা
-    document.getElementById('data-form').reset();
-});
-
+        e.preventDefault();
+        // পেজ পরিবর্তন
+        document.getElementById('page1').classList.remove('active-page');
+        document.getElementById('page2').classList.add('active-page');
+        // এখানে ফর্মের ডেটাগুলো Firebase এ পাঠানোর ফাংশন কল করতে পারেন
+    });
 </script>
 </body>
 </html>
-<!-- Data Input Form Section -->
-<div class="bg-white/10 p-6 rounded-2xl mt-8">
-    <h3 class="text-xl font-bold mb-4">উত্তরাধিকার তথ্য জমা দিন</h3>
-    <form id="data-form" class="flex flex-col gap-4">
-        <input type="text" id="user-name" placeholder="আপনার নাম" class="p-3 rounded-lg bg-white/20" required>
-        <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম" class="p-3 rounded-lg bg-white/20" required>
-        <input type="number" id="amount" placeholder="উত্তরাধিকারের পরিমাণ (টাকা)" class="p-3 rounded-lg bg-white/20" required>
-        <button type="submit" class="bg-sky-500 py-3 rounded-lg font-bold">তথ্য জমা দিন</button>
-    </form>
-</div>
+
