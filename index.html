@@ -40,23 +40,39 @@
     <button class="action-btn" style="background:#666" onclick="location.reload()">ফিরে যান</button>
 </div>
 
-<script>
-    const firebaseConfig = { databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app" };
-    firebase.initializeApp(firebaseConfig);
-
-    function saveDataAndGo() {
-        const uName = document.getElementById('user-name').value;
-        const dName = document.getElementById('deceased-name').value;
-        const amount = document.getElementById('total-estate-amount').value;
-        
-        firebase.database().ref('miras_records/').push({
-            userName: uName, deceasedName: dName, amount: amount, timestamp: Date.now()
-        }).then(() => {
-            document.getElementById('estate').value = amount;
-            document.getElementById('page1').classList.remove('active-page');
-            document.getElementById('page2').classList.add('active-page');
-        });
+function saveDataAndGo() {
+    const uName = document.getElementById('user-name').value;
+    const dName = document.getElementById('deceased-name').value;
+    const amount = document.getElementById('total-estate-amount').value;
+    
+    // ১. চেক করি ডেটা আছে কি না
+    if (!uName || !dName || !amount) {
+        alert("সবগুলো ঘর পূরণ করুন!");
+        return;
     }
+
+    // ২. ফায়ারবেসে ডেটা পুশ করি
+    firebase.database().ref('miras_records/').push({
+        userName: uName, 
+        deceasedName: dName, 
+        amount: amount, 
+        timestamp: Date.now()
+    }).then(() => {
+        // ৩. পেজ সুইচিং (সরাসরি ক্লাস রিমুভ ও অ্যাড)
+        document.getElementById('page1').classList.remove('active-page');
+        document.getElementById('page2').classList.add('active-page');
+        
+        // ৪. ক্যালকুলেটরের ইনপুটে অ্যামাউন্ট বসিয়ে দেওয়া
+        const est = document.getElementById('estate'); // আপনার ক্যালকুলেটরের ইনপুট আইডি যদি estate হয়
+        if(est) est.value = amount;
+        
+        console.log("পেজ পরিবর্তন সফল!");
+    }).catch((error) => {
+        console.error("Firebase Error: ", error);
+        alert("সার্ভারে সমস্যা হচ্ছে, একবার পেজটি রিলোড দিন।");
+    });
+}
+
 
     // ৫৫০ লাইনের ক্যালকুলেশন লজিক এখন এখানে সরাসরি কাজ করবে
     function processMirasSimulation() {
