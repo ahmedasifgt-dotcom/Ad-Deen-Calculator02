@@ -8,200 +8,57 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <style>
+        /* আপনার বর্তমান স্টাইলগুলো এখানে থাকবে */
         :root { --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%); --accent: #E6C25A; }
-        body { background: var(--bg-gradient); color: #fff; padding: 20px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-gradient); color: #fff; padding: 20px; font-family: sans-serif; }
         .page { display: none; }
         .active-page { display: block; }
         .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .action-btn { width: 100%; background: linear-gradient(135deg, #E6C25A 0%, #C9A43B 100%); border: none; border-radius: 12px; padding: 14px; color: #041a10; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        input, select { width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: #fff; margin-bottom: 10px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; background: #0b2e1d; color: #fff; border: 1px solid #E6C25A; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<div id="page1" class="page active-page glass-card">
-    <h2 style="color:var(--accent);">Ad-Deen Calculator</h2>
-    <label>আপনার নাম:</label>
-    <input type="text" id="user-name" placeholder="আপনার নাম">
-    <label>মৃত ব্যক্তির নাম:</label>
-    <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম">
-    <label>মোট সম্পত্তির পরিমাণ (৳):</label>
-    <input type="number" id="total-estate-amount" placeholder="টাকার পরিমাণ">
-    <button class="action-btn" onclick="saveDataAndGo()">ক্যালকুলেটরে যান</button>
-</div>
-
-<div id="page2" class="page glass-card">
-    <div id="calculator-content">
-        <label>মোট বণ্টনযোগ্য সম্পত্তি</label>
-        <input type="number" id="estate">
-        <button class="action-btn" onclick="processMirasSimulation()">শরিয়াহ মোতাবেক সিমুলেট করুন</button>
-        <div id="resultsList"></div>
+    <div id="page1" class="page active-page glass-card">
+        <h2>Ad-Deen Calculator</h2>
+        <input type="text" id="user-name" placeholder="আপনার নাম">
+        <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম">
+        <input type="number" id="total-estate-amount" placeholder="সম্পত্তির পরিমাণ (টাকা)">
+        <button class="action-btn" onclick="saveDataAndGo()">ক্যালকুলেটরে যান</button>
     </div>
-    <button class="action-btn" style="background:#666" onclick="location.reload()">ফিরে যান</button>
-</div>
 
-function saveDataAndGo() {
-    const uName = document.getElementById('user-name').value;
-    const dName = document.getElementById('deceased-name').value;
-    const amount = document.getElementById('total-estate-amount').value;
-    
-    // ১. চেক করি ডেটা আছে কি না
-    if (!uName || !dName || !amount) {
-        alert("সবগুলো ঘর পূরণ করুন!");
-        return;
-    }
+    <div id="page2" class="page glass-card">
+        <h3>মীরাস সিমুলেটর</h3>
+        <input type="number" id="estateValue" placeholder="মোট সম্পত্তি">
+        <button class="action-btn" onclick="processMirasSimulation()">হিসাব করুন</button>
+        <div id="resultsList"></div>
+        <button class="action-btn" style="background:#666" onclick="location.reload()">ফিরে যান</button>
+    </div>
 
-    // ২. ফায়ারবেসে ডেটা পুশ করি
-    firebase.database().ref('miras_records/').push({
-        userName: uName, 
-        deceasedName: dName, 
-        amount: amount, 
-        timestamp: Date.now()
-    }).then(() => {
-        // ৩. পেজ সুইচিং (সরাসরি ক্লাস রিমুভ ও অ্যাড)
-        document.getElementById('page1').classList.remove('active-page');
-        document.getElementById('page2').classList.add('active-page');
-        
-        // ৪. ক্যালকুলেটরের ইনপুটে অ্যামাউন্ট বসিয়ে দেওয়া
-        const est = document.getElementById('estate'); // আপনার ক্যালকুলেটরের ইনপুট আইডি যদি estate হয়
-        if(est) est.value = amount;
-        
-        console.log("পেজ পরিবর্তন সফল!");
-    }).catch((error) => {
-        console.error("Firebase Error: ", error);
-        alert("সার্ভারে সমস্যা হচ্ছে, একবার পেজটি রিলোড দিন।");
-    });
-}
+    <script>
+        // Firebase কনফিগারেশন
+        const firebaseConfig = { databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig);
 
+        function saveDataAndGo() {
+            const uName = document.getElementById('user-name').value;
+            const amount = document.getElementById('total-estate-amount').value;
+            
+            // ফায়ারবেসে সেভ
+            firebase.database().ref('miras_records/').push({ userName: uName, amount: amount });
 
-    // ৫৫০ লাইনের ক্যালকুলেশন লজিক এখন এখানে সরাসরি কাজ করবে
-    function processMirasSimulation() {
-    syncUI();
-    
-    const deceased = document.getElementById('deceased').value;
-    const totalAsset = parseFloat(document.getElementById('estateValue').value) || 0;
-    const spouseStatus = document.getElementById('spouse').value;
-    const isMotherAlive = document.getElementById('mother').value === 'alive';
-    const sonsCount = parseInt(document.getElementById('sons').value) || 0;
-    const daughtersCount = parseInt(document.getElementById('daughters').value) || 0;
-
-    let remaining = totalAsset;
-    let records = [];
-    const hasChildren = (sonsCount > 0 || daughtersCount > 0);
-
-    if (spouseStatus === 'alive') {
-        let f = hasChildren ? (deceased==='father'? 1/8 : 1/4) : (deceased==='father'? 1/4 : 1/2);
-        let str = hasChildren ? (deceased==='father'?"1/8":"1/4") : (deceased==='father'?"1/4":"1/2");
-        let amt = totalAsset * f;
-        records.push({ id: 'card-spouse', name: deceased==='father'?"স্ত্রী":"স্বামী", fraction: str, cash: amt, type: 'fixed' });
-        remaining -= amt;
-    } else {
-        markBlocked('card-spouse', 'অনুপস্থিত');
-    }
-
-    if (isMotherAlive) {
-        let f = hasChildren ? 1/6 : 1/3;
-        let str = hasChildren ? "1/6" : "1/3";
-        let amt = totalAsset * f;
-        records.push({ id: 'card-mother', name: "মাতা", fraction: str, cash: amt, type: 'fixed' });
-        remaining -= amt;
-    } else {
-        markBlocked('card-mother', 'অনুপস্থিত');
-    }
-
-    if (hasChildren) {
-        let parts = (sonsCount * 2) + (daughtersCount * 1);
-        let shareUnit = Math.max(0, remaining) / parts;
-
-        if (sonsCount > 0) {
-            let totalSonAmt = shareUnit * 2 * sonsCount;
-            records.push({ id: 'card-sons', name: `পুত্র (×${sonsCount})`, fraction: "আসাবাহ্", cash: totalSonAmt, type: 'residue', single: shareUnit*2 });
-        } else {
-            markBlocked('card-sons', 'নেই');
+            // পেজ পরিবর্তন
+            document.getElementById('estateValue').value = amount;
+            document.getElementById('page1').style.display = 'none';
+            document.getElementById('page2').style.display = 'block';
         }
 
-        if (daughtersCount > 0) {
-            let totalDaughterAmt = shareUnit * 1 * daughtersCount;
-            records.push({ id: 'card-daughters', name: `কন্যা (×${daughtersCount})`, fraction: "আসাবাহ্", cash: totalDaughterAmt, type: 'residue', single: shareUnit });
-        } else {
-            markBlocked('card-daughters', 'নেই');
+        // আপনার ৫৫০ লাইনের ক্যালকুলেশন লজিকগুলো এখানে বসান
+        function processMirasSimulation() { 
+            /* আপনার লজিক এখানে */ 
         }
-        remaining = 0;
-    } else {
-        markBlocked('card-sons', 'কোনো সন্তান নেই');
-        markBlocked('card-daughters', 'কোনো সন্তান নেই');
-    }
-
-    const resultsList = document.getElementById('resultsList');
-    resultsList.innerHTML = "";
-
-    records.forEach(item => {
-        const card = document.getElementById(item.id);
-        card.classList.add('active-heir');
-        
-        const statusEl = document.getElementById('status-' + item.id.split('-')[1]);
-        const allocEl = document.getElementById('alloc-' + item.id.split('-')[1]);
-        
-        statusEl.innerText = `পাবেন (${item.fraction})`;
-        allocEl.innerText = `${Math.round(item.cash).toLocaleString('bn-BD')} ৳`;
-        allocEl.style.display = "block";
-
-        let subText = item.type === 'fixed' ? "কোরআনিক নির্ধারিত সুনির্দিষ্ট অংশ" : `অবশিষ্টাংশভোগী (প্রত্যেকে পাবে: ${Math.round(item.single || item.cash).toLocaleString('bn-BD')} ৳)`;
-        resultsList.innerHTML += `
-            <div class="result-item">
-                <div>
-                    <div class="heir-name">${item.name}</div>
-                    <div class="heir-sub">${subText}</div>
-                </div>
-                <div style="text-align: right">
-                    <span class="share-badge">${item.fraction}</span>
-                    <div class="cash-text">${item.cash.toLocaleString('bn-BD', {maximumFractionDigits:2})} ৳</div>
-                </div>
-            </div>
-        `;
-    });
-
-    document.getElementById('resultsPanel').style.display = "block";
-}
-
-
-        syncUI(); 
-        // ... এরপর আপনার ক্যালকুলেটরের বাকি কোডটুকু এখানে থাকবে
-    }
-function syncUI() {
-    const deceased = document.getElementById('deceased').value;
-    const spouseSelect = document.getElementById('spouse').value;
-    const isMotherAlive = document.getElementById('mother').value === 'alive';
-    const sons = parseInt(document.getElementById('sons').value) || 0;
-    const daughters = parseInt(document.getElementById('daughters').value) || 0;
-
-    document.getElementById('spouseLabel').innerText = deceased === 'father' ? "জীবিত স্ত্রীর অবস্থা:" : "জীবিত স্বামীর অবস্থা:";
-    document.getElementById('title-spouse').innerText = deceased === 'father' ? "স্ত্রী (Wife)" : "স্বামী (Husband)";
-
-    resetCard('card-mother', isMotherAlive ? "অবস্থাগত সক্রিয়" : "মৃত / অনুপস্থিত");
-    resetCard('card-spouse', spouseSelect === 'alive' ? "অবস্থাগত সক্রিয়" : "মৃত / অনুপস্থিত");
-    resetCard('card-sons', sons > 0 ? `${sons} জন ওয়ারিশ` : "নেই");
-    resetCard('card-daughters', daughters > 0 ? `${daughters} জন ওয়ারিশ` : "নেই");
-}
-
-function resetCard(id, msg) {
-    const card = document.getElementById(id);
-    card.className = "member-card";
-    document.getElementById('status-' + id.split('-')[1]).innerText = msg;
-    document.getElementById('alloc-' + id.split('-')[1]).style.display = "none";
-}
-function markBlocked(id, reason) {
-    const card = document.getElementById(id);
-    card.classList.add('blocked-heir');
-    document.getElementById('status-' + id.split('-')[1]).innerText = reason;
-}
-
-syncUI();
-
-
-    // আপনার ক্যালকুলেটরের অন্যান্য ফাংশনগুলো এখানে নিচে বসিয়ে দিন (যেমন: syncUI, resetCard, markBlocked)
-</script>
-
+    </script>
 </body>
 </html>
 
