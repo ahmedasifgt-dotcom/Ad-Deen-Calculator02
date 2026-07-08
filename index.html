@@ -1,43 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ad-Deen Visual Miras Calculator</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <style>
-        :root { --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%); --accent: #E6C25A; }
-        body { background: var(--bg-gradient); color: #fff; padding: 20px; font-family: sans-serif; }
-        .page { display: none; }
-        .active-page { display: block; }
-        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        .action-btn { width: 100%; background: linear-gradient(135deg, #E6C25A 0%, #C9A43B 100%); border: none; border-radius: 12px; padding: 14px; color: #041a10; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        input, select { width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: #fff; margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-
-<!-- পেজ ১ -->
-<div id="page1" class="page active-page glass-card">
-    <h2 style="color:var(--accent);">Ad-Deen Calculator</h2>
-    <label>আপনার নাম:</label>
-    <input type="text" id="user-name" placeholder="আপনার নাম লিখুন">
-    <label>মৃত ব্যক্তির নাম:</label>
-    <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম লিখুন">
-    <label>মোট সম্পত্তির পরিমাণ (৳):</label>
-    <input type="number" id="total-estate-amount" placeholder="টাকার পরিমাণ">
-    <button class="action-btn" onclick="saveDataAndGo()">ক্যালকুলেটরে যান</button>
-</div>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad-Deen Visual Miras Calculator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Amiri+Quran&family=Noto+Serif+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #041a10 0%, #092f1d 50%, #0f3f27 100%);
@@ -332,8 +301,21 @@
         }
         .cash-text { font-size: 0.95rem; font-weight: 700; color: #FFF; margin-top: 2px;}
     </style>
+
 </head>
 <body>
+
+    <!-- পেজ ১: ইনপুট -->
+    <div id="page1" class="page active-page">
+        <h2>Ad-Deen Calculator</h2>
+        <input type="text" id="user-name" placeholder="আপনার নাম">
+        <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম">
+        <input type="number" id="total-estate-amount" placeholder="সম্পত্তির পরিমাণ">
+        <button onclick="goToCalculator()">ক্যালকুলেটরে যান</button>
+    </div>
+
+    <!-- পেজ ২: পুরো ক্যালকুলেটর -->
+    <div <body>
 
 <div class="app-container">
     <header>
@@ -440,6 +422,32 @@
 </div>
 
 <script>
+    <script>
+    // Firebase Config
+    const firebaseConfig = { databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+
+    function saveDataAndGo() {
+        const uName = document.getElementById('user-name').value;
+        const dName = document.getElementById('deceased-name').value;
+        const amount = document.getElementById('total-estate-amount').value;
+        
+        firebase.database().ref('miras_records/').push({
+            userName: uName,
+            deceasedName: dName,
+            amount: amount,
+            timestamp: Date.now()
+        }).then(() => {
+            // পেজ পরিবর্তন
+            document.getElementById('page1').classList.remove('active-page');
+            document.getElementById('page2').classList.add('active-page');
+            // ক্যালকুলেটরে ভ্যালু সেট করা
+            const estInput = document.getElementById('estateValue');
+            if(estInput) estInput.value = amount;
+        }).catch(err => alert("সেভ করতে সমস্যা হয়েছে: " + err));
+    }
+</script>
+
 function syncUI() {
     const deceased = document.getElementById('deceased').value;
     const spouseSelect = document.getElementById('spouse').value;
@@ -561,40 +569,27 @@ function markBlocked(id, reason) {
 syncUI();
 </script>
 </body>
-</html>
-<div id="page2" class="page glass-card">
-    <!-- আপনার ৫৫০ লাইনের ক্যালকুলেটরের বডি পার্ট এখানে কপি-পেস্ট করুন -->
-    <h2 style="color:var(--accent);">ক্যালকুলেটর</h2>
-    <!-- এখানে আপনার সেই বিশাল ক্যালকুলেটর ডিজাইন ও লজিক থাকবে -->
-    <button class="action-btn" style="background:#666" onclick="location.reload()">ফিরে যান</button>
-</div>
 
-<script>
-    // Firebase Config
-    const firebaseConfig = { databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app" };
-    firebase.initializeApp(firebaseConfig);
+    </div>
 
-    function saveDataAndGo() {
-        const uName = document.getElementById('user-name').value;
-        const dName = document.getElementById('deceased-name').value;
-        const amount = document.getElementById('total-estate-amount').value;
-        
-        firebase.database().ref('miras_records/').push({
-            userName: uName,
-            deceasedName: dName,
-            amount: amount,
-            timestamp: Date.now()
-        }).then(() => {
+    <script>
+        // Firebase কনফিগারেশন
+        const firebaseConfig = { databaseURL: "https://ad-deen-s-database-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig);
+
+        function goToCalculator() {
+            // ডাটা সেভ
+            firebase.database().ref('miras_records/').push({
+                userName: document.getElementById('user-name').value,
+                amount: document.getElementById('total-estate-amount').value
+            });
             // পেজ পরিবর্তন
             document.getElementById('page1').classList.remove('active-page');
             document.getElementById('page2').classList.add('active-page');
-            // ক্যালকুলেটরে ভ্যালু সেট করা
-            const estInput = document.getElementById('estateValue');
-            if(estInput) estInput.value = amount;
-        }).catch(err => alert("সেভ করতে সমস্যা হয়েছে: " + err));
-    }
-</script>
+        }
 
+        // এখানে আপনার সেই ৫৫০ লাইনের কোডের পুরো জাভাস্ক্রিপ্ট লজিক কপি করে বসিয়ে দিন
+    </script>
 </body>
 </html>
 
