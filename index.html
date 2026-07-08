@@ -529,6 +529,32 @@ function markBlocked(id, reason) {
 }
 
 syncUI();
+    document.getElementById('data-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // ফর্ম থেকে ডেটা নেওয়া
+    const userName = document.getElementById('user-name').value;
+    const deceasedName = document.getElementById('deceased-name').value;
+    const amount = document.getElementById('amount').value;
+    
+    // আপাতত আমরা কনসোলে টেস্ট করছি, পরে Firebase এ পাঠাবো
+    console.log("তথ্য জমা হয়েছে:", { userName, deceasedName, amount });
+    alert("আপনার তথ্য সফলভাবে জমা হয়েছে!");
+    
+    // ফর্ম ক্লিয়ার করা
+    document.getElementById('data-form').reset();
+});
+
 </script>
 </body>
 </html>
+<!-- Data Input Form Section -->
+<div class="bg-white/10 p-6 rounded-2xl mt-8">
+    <h3 class="text-xl font-bold mb-4">উত্তরাধিকার তথ্য জমা দিন</h3>
+    <form id="data-form" class="flex flex-col gap-4">
+        <input type="text" id="user-name" placeholder="আপনার নাম" class="p-3 rounded-lg bg-white/20" required>
+        <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম" class="p-3 rounded-lg bg-white/20" required>
+        <input type="number" id="amount" placeholder="উত্তরাধিকারের পরিমাণ (টাকা)" class="p-3 rounded-lg bg-white/20" required>
+        <button type="submit" class="bg-sky-500 py-3 rounded-lg font-bold">তথ্য জমা দিন</button>
+    </form>
+</div>
