@@ -41,13 +41,26 @@
     const dName = document.getElementById('deceased-name').value;
     const amount = document.getElementById('total-estate-amount').value;
     
-    // ডাটাবেসে সেভ করুন
+    // চেক করার জন্য
+    console.log("Saving data:", uName, dName, amount); 
+
+    // Firebase এ ডেটা পাঠানো
     firebase.database().ref('miras_records/').push({
         userName: uName,
         deceasedName: dName,
         amount: amount,
         timestamp: Date.now()
+    }).then(() => {
+        console.log("Data saved successfully!");
+        // পেজ পরিবর্তন
+        document.getElementById('page1').classList.remove('active-page');
+        document.getElementById('page2').classList.add('active-page');
+    }).catch((error) => {
+        console.error("Error saving data: ", error);
+        alert("ডেটা সেভ হতে সমস্যা হয়েছে!");
     });
+}
+
 
     // পরের পেজে যান
     document.getElementById('page1').classList.remove('active-page');
@@ -600,6 +613,9 @@ function markBlocked(id, reason) {
 
 syncUI();
 </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 </body>
 </html>
         <!-- ফিরে যান বাটনটি নিচে দেওয়া হলো -->
@@ -625,6 +641,8 @@ syncUI();
         });
     }
 </script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 </body>
 </html>
