@@ -19,14 +19,37 @@
 
 <div class="app-container">
     <!-- পেজ ১ -->
-    <div id="page1" class="page active-page glass-card">
-        <h2 style="color:var(--accent)">Ad-Deen Calculator</h2>
-        <label>আপনার নাম:</label>
-        <input type="text" placeholder="আপনার নাম লিখুন">
-        <label>মৃত ব্যক্তির নাম:</label>
-        <input type="text" placeholder="মৃত ব্যক্তির নাম লিখুন">
-        <button class="action-btn" onclick="document.getElementById('page1').classList.remove('active-page'); document.getElementById('page2').classList.add('active-page');">ক্যালকুলেটরে যান</button>
-    </div>
+    <!-- পেজ ১: নাম এবং অ্যামাউন্ট ইনপুট -->
+<div id="page1" class="page active-page glass-card">
+    <h2 style="color:var(--accent); margin-bottom: 20px;">Ad-Deen Calculator</h2>
+    
+    <label>আপনার নাম:</label>
+    <input type="text" id="user-name" placeholder="আপনার নাম লিখুন">
+    
+    <label>মৃত ব্যক্তির নাম:</label>
+    <input type="text" id="deceased-name" placeholder="মৃত ব্যক্তির নাম লিখুন">
+    
+    <label>মোট সম্পত্তির পরিমাণ (৳):</label>
+    <input type="number" id="total-estate-amount" placeholder="এখানে টাকার পরিমাণ লিখুন">
+    
+    <button class="action-btn" onclick="saveDataAndGo()">ক্যালকুলেটরে যান</button>
+</div>
+
+<script>
+    function saveDataAndGo() {
+        // এখানে নাম এবং অ্যামাউন্টগুলো ভেরিয়েবলে সেভ করে রাখুন
+        const userName = document.getElementById('user-name').value;
+        const estateAmount = document.getElementById('total-estate-amount').value;
+        
+        // দ্বিতীয় পেজের ইনপুট ফিল্ডে ভ্যালু পাঠিয়ে দিন
+        document.getElementById('estateValue').value = estateAmount;
+        
+        // পেজ পরিবর্তন
+        document.getElementById('page1').classList.remove('active-page');
+        document.getElementById('page2').classList.add('active-page');
+    }
+</script>
+
 
     <!-- পেজ ২ -->
     <div id="page2" class="page">
