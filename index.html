@@ -120,31 +120,43 @@
     <h1>Islamic Inheritance (Miras) Engine</h1>
     <div class="subtitle">A smart prototype mapping Hanafi Fiqh calculations into modern code</div>
 
+    <!-- NEW: Select Who Died -->
+    <div class="form-group">
+        <label for="deceased">Who is the Deceased Person? (মৃত ব্যক্তি কে?)</label>
+        <select id="deceased" onchange="updateSpouseDropdown()">
+            <option value="father">Father (পিতা মারা গেছেন)</option>
+            <option value="mother">Mother (মাতা মারা গেছেন)</option>
+        </select>
+    </div>
+
+    <!-- Estate Value -->
     <div class="form-group">
         <label for="estateValue">Total Distributable Estate Value (BDT / Taka):</label>
-        <input type="number" id="estateValue" value="1200000" min="0" placeholder="Enter net cash amount after debt & funeral expenses">
+        <input type="number" id="estateValue" value="1200000" min="0">
     </div>
 
     <div class="grid-2">
+        <!-- Dynamic Spouse Option -->
         <div class="form-group">
-            <label for="spouse">Surviving Spouse:</label>
+            <label id="spouseLabel" for="spouse">Surviving Wife Status:</label>
             <select id="spouse">
-                <option value="none">None</option>
-                <option value="wife">Wife (১ স্ত্রী)</option>
-                <option value="husband">Husband (স্বামী)</option>
+                <option value="alive">Alive (স্ত্রী জীবিত)</option>
+                <option value="none">None / Deceased (স্ত্রী নেই)</option>
             </select>
         </div>
 
+        <!-- Parents Option -->
         <div class="form-group">
-            <label for="mother">Mother Status:</label>
+            <label for="mother">Deceased's Mother Status:</label>
             <select id="mother">
-                <option value="alive">Alive (মা জীবিত)</option>
-                <option value="dead">Deceased (মা মৃত)</option>
+                <option value="alive">Alive (মৃত ব্যক্তির মা জীবিত)</option>
+                <option value="dead">Deceased (মৃত ব্যক্তির মা মৃত)</option>
             </select>
         </div>
     </div>
 
     <div class="grid-2">
+        <!-- Children Configuration -->
         <div class="form-group">
             <label for="sons">Number of Surviving Sons:</label>
             <input type="number" id="sons" value="2" min="0">
@@ -169,81 +181,100 @@
 </div>
 
 <script>
+// Automatically update the label texts based on who passed away
+function updateSpouseDropdown() {
+    const deceased = document.getElementById('deceased').value;
+    const spouseLabel = document.getElementById('spouseLabel');
+    const spouseSelect = document.getElementById('spouse');
+
+    if (deceased === 'father') {
+        spouseLabel.innerText = "Surviving Wife Status:";
+        spouseSelect.innerHTML = `
+            <option value="alive">Alive (স্ত্রী জীবিত)</option>
+            <option value="none">None / Deceased (স্ত্রী নেই)</option>
+        `;
+    } else {
+        spouseLabel.innerText = "Surviving Husband Status:";
+        spouseSelect.innerHTML = `
+            <option value="alive">Alive (স্বামী জীবিত)</option>
+            <option value="none">None / Deceased (স্বামী নেই)</option>
+        `;
+    }
+}
+
 function calculateMiras() {
+    const deceased = document.getElementById('deceased').value;
     const totalAsset = parseFloat(document.getElementById('estateValue').value) || 0;
-    const spouse = document.getElementById('spouse').value;
+    const spouseStatus = document.getElementById('spouse').value;
     const isMotherAlive = document.getElementById('mother').value === 'alive';
     const sonsCount = parseInt(document.getElementById('sons').value) || 0;
     const daughtersCount = parseInt(document.getElementById('daughters').value) || 0;
 
     let initialAsset = totalAsset;
     let distributions = [];
-    
-    // Check if children exist
     const hasChildren = (sonsCount > 0 || daughtersCount > 0);
 
-    // 1. Calculate Spouse Share (Ashab al-Furud)
-    let spouseShareFraction = 0;
-    let spouseName = "";
-    if (spouse === 'wife') {
-        spouseShareFraction = hasChildren ? (1/8) : (1/4);
-        spouseName = "Wife (স্ত্রী)";
-    } else if (spouse === 'husband') {
-        spouseShareFraction = hasChildren ? (1/4) : (1/2);
-        spouseName = "Husband (স্বামী)";
+    // 1. Calculate Spouse Share based on gender of deceased
+    let spouseFraction = 0;
+    let spouseLabelText = "";
+    let fractionStr = "";
+
+    if (deceased === 'father') {
+        spouseLabelText = "Wife (স্ত্রী)";
+        if (spouseStatus === 'alive') {
+            spouseFraction = hasChildren ? (1/8) : (1/4);
+            fractionStr = hasChildren ? "1/8" : "1/4";
+        }
+    } else {
+        spouseLabelText = "Husband (স্বামী)";
+        if (spouseStatus === 'alive') {
+            spouseFraction = hasChildren ? (1/4) : (1/2);
+            fractionStr = hasChildren ? "1/4" : "1/2";
+        }
     }
 
-    if (spouseShareFraction > 0) {
-        let amount = initialAsset * spouseShareFraction;
-        distributions.push({ name: spouseName, fraction: spouse === 'wife' && hasChildren ? "1/8" : (spouse === 'wife' ? "1/4" : (hasChildren ? "1/4" : "1/2")), cash: amount });
-        totalAsset -= amount;
+    if (spouseFraction > 0) {
+        let amount = initialAsset * spouseFraction;
+        distributions.push({ name: spouseLabelText, fraction: fractionStr, cash: amount });
+        initialAsset -= amount;
     }
 
-    // 2. Calculate Mother Share (Ashab al-Furud)
+    // 2. Calculate Mother Share (The mother of the deceased)
     if (isMotherAlive) {
-        // Mother gets 1/6 if children or multiple siblings exist, else 1/3
-        let motherFractionStr = hasChildren ? "1/6" : "1/3";
         let motherFractionVal = hasChildren ? (1/6) : (1/3);
+        let motherFractionStr = hasChildren ? "1/6" : "1/3";
         let amount = initialAsset * motherFractionVal;
-        distributions.push({ name: "Mother (মাতা)", fraction: motherFractionStr, cash: amount });
-        totalAsset -= amount;
+        distributions.push({ name: "Mother of Deceased (মাতা)", fraction: motherFractionStr, cash: amount });
+        initialAsset -= amount;
     }
 
     // 3. Residuary Distribution to Children (Asabat)
     if (hasChildren) {
-        // Total parts dynamic calculation: 2 shares per son, 1 share per daughter
         let totalParts = (sonsCount * 2) + (daughtersCount * 1);
-        let sharePerPart = totalAsset / totalParts;
+        let sharePerPart = initialAsset / totalParts;
 
         if (sonsCount > 0) {
             let totalSonCash = sharePerPart * 2 * sonsCount;
-            let individualSonCash = sharePerPart * 2;
             distributions.push({ 
                 name: `Sons (পুত্র সন্তানসমূহ) - Total for ${sonsCount}`, 
                 fraction: `Asabah (2 parts each)`, 
                 cash: totalSonCash,
-                individual: sonsCount > 1 ? individualSonCash : null
+                individual: sonsCount > 1 ? (sharePerPart * 2) : null
             });
         }
 
         if (daughtersCount > 0) {
             let totalDaughterCash = sharePerPart * 1 * daughtersCount;
-            let individualDaughterCash = sharePerPart * 1;
             distributions.push({ 
                 name: `Daughters (কন্যা সন্তানসমূহ) - Total for ${daughtersCount}`, 
                 fraction: `Asabah (1 part each)`, 
                 cash: totalDaughterCash,
-                individual: daughtersCount > 1 ? individualDaughterCash : null
+                individual: daughtersCount > 1 ? (sharePerPart * 1) : null
             });
-        }
-    } else {
-        // Simplified fallback for this frontend prototype if no kids exist
-        if (totalAsset > 0 && distributions.length > 0) {
-            distributions[0].cash += totalAsset; // Radd or fallback adjustment
         }
     }
 
-    // Render Results beautifully to UI
+    // Render to UI
     const resultsList = document.getElementById('resultsList');
     resultsList.innerHTML = "";
     
